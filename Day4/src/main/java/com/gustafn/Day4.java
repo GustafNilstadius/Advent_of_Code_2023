@@ -1,9 +1,6 @@
 package com.gustafn;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class Day4 {
 
@@ -33,6 +30,39 @@ public class Day4 {
         }
         return sum(points);
     }
+
+    public long part2(List<String> input) {
+        List<Integer> points = new LinkedList<>();
+        Map<Integer, Integer> winnings = new HashMap<>();
+        Queue<Integer> queue = new LinkedList<>();
+        for (String card : input) {
+            int cardNumber = getCardNumber(card);
+            String numbers = card.substring(card.indexOf(":")+1);
+            String winningNumbersString = numbers.substring(0, numbers.indexOf("|"));
+            String myNumbersString = numbers.substring(numbers.indexOf("|")+1);
+            Set<Integer> winningNumbers = getNumbers(winningNumbersString);
+            Set<Integer> myNumbers = getNumbers(myNumbersString);
+            int myNumbersCount = myNumbers.size();
+            myNumbers.removeAll(winningNumbers);
+            int diff = myNumbersCount - myNumbers.size();
+            winnings.put(cardNumber, diff);
+            queue.add(cardNumber);
+        }
+        int count = 0;
+        while (!queue.isEmpty()) {
+            if(!winnings.containsKey(queue.peek())) {
+                return 0;
+            }
+            int card = queue.poll();
+            int nextIWon = winnings.get(card);
+            for (int i = 1; i <= nextIWon; i++) {
+                queue.add(card + i);
+            }
+            count++;
+        }
+        return count;
+    }
+
 
     private HashSet<Integer> getNumbers(String s) {
         String[] numbers = s.split(" ");
